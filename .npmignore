@@ -1,3 +1,7 @@
 .DS_Store
 node_modules
 npm-debug.log
+test/fixtures/basic/ace/
+test/fixtures/basic/index.html
+test/fixtures/basic/viewsaurus.css
+test/fixtures/basic/viewsaurus.js

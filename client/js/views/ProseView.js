@@ -1,3 +1,10 @@
+// Get Title for a step either from a data attribute or the first title tag
+function titleForStep($e) {
+    var title = $e.attr('data-title');
+    if (!title) title = $e.find('h1, h2, h3, h4, h5').first().text();
+    return title;
+}
+
 // Represent UI state for prose view
 var ProseModel = Backbone.Model.extend({
     defaults: {
@@ -97,7 +104,7 @@ var ProseView = Backbone.View.extend({
         var text = "You did it! Good for you :)";
         if (index < self.app.totalSteps) {
             var $next = self.$content.find('.step').eq(index);
-            var truncated = $next.attr('data-title').substring(0,35);
+            var truncated = titleForStep($next).substring(0,35);
             if (truncated.length > 34) {
                 truncated += '...';
             }
@@ -138,7 +145,7 @@ var ProseView = Backbone.View.extend({
         self.$content.scrollTop(0);
 
         // Update section title
-        self.$title.html($step.attr('data-title'));
+        // self.$title.html($step.attr('data-title'));
 
         // Update current link in overview
         self.$overviewList.find('li').removeClass('current');
@@ -193,30 +200,16 @@ var ProseView = Backbone.View.extend({
     populateOverview: function() {
         var self = this;
         var html = '';
-        var firstChapter = true;
         var stepIndex = 0;
 
-        // Iterate over chapters, extract data, build overview HTML
-        self.$content.find('.chapter, .step').each(function() {
-            var $thing = $(this);
-            if ($thing.hasClass('chapter')) {
-                if (!firstChapter) {
-                    // end previous chapter
-                    html += '</ul></li>';
-                }
-                firstChapter = false;
-                html += '<li class="chapter"><span>';
-                html += $thing.attr('data-title') + '</span><ul>';
-            } else {
-                html += '<li data-step="' + stepIndex + '">';
-                html += '<a href="#' + stepIndex + '">';
-                html += $thing.attr('data-title') + '</a></li>';
-                stepIndex++;
-            }
+        // Iterate over steps, extract data, build overview HTML
+        self.$content.find('.step').each(function() {
+            var $step = $(this);
+            html += '<li data-step="' + stepIndex + '">';
+            html += '<a href="#' + stepIndex + '">';
+            html += titleForStep($step) + '</a></li>';
+            stepIndex++;
         });
-
-        // close off final chapter li
-        html += '</ul></li>';
 
         // Append generated overview HTML
         self.$overviewList.html(html);
