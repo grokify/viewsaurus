@@ -200,16 +200,30 @@ var ProseView = Backbone.View.extend({
     populateOverview: function() {
         var self = this;
         var html = '';
+        var firstChapter = true;
         var stepIndex = 0;
 
-        // Iterate over steps, extract data, build overview HTML
-        self.$content.find('.step').each(function() {
-            var $step = $(this);
-            html += '<li data-step="' + stepIndex + '">';
-            html += '<a href="#' + stepIndex + '">';
-            html += titleForStep($step) + '</a></li>';
-            stepIndex++;
+        // Iterate over chapters, extract data, build overview HTML
+        self.$content.find('.chapter, .step').each(function() {
+            var $thing = $(this);
+            if ($thing.hasClass('chapter')) {
+                if (!firstChapter) {
+                    // end previous chapter
+                    html += '</ul></li>';
+                }
+                firstChapter = false;
+                html += '<li class="chapter"><span>';
+                html += $thing.attr('data-title') + '</span><ul>';
+            } else {
+                html += '<li data-step="' + stepIndex + '">';
+                html += '<a href="#' + stepIndex + '">';
+                html += titleForStep($thing) + '</a></li>';
+                stepIndex++;
+            }
         });
+
+        // close off final chapter li
+        html += '</ul></li>';
 
         // Append generated overview HTML
         self.$overviewList.html(html);
